@@ -26,5 +26,5 @@ const socket = tls.connect(options, () => {
     process.stdin.resume();
     
     socket.on('error', error => console.log(error.code));
-    socket.on('end', (data) => console.log('Socket end event'));
+    socket.on('end', (data) => { console.log('Socket end event'); process.exit(0)});
 });
