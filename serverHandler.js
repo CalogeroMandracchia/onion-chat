@@ -1,6 +1,6 @@
 'use strict';
 
-const { zip, unzip, decrypt, encrypt } = require('./cryptography');
+const { encrypt, decrypt } = require('./encryptText');
 
 const readline = require('readline');
 const rl = readline.createInterface({input: process.stdin, output: process.stdout, prompt: "you: "});
@@ -8,34 +8,41 @@ const rl = readline.createInterface({input: process.stdin, output: process.stdou
 const onData = data =>
 {
     rl.setPrompt("client: ");
-    //rl.write('\n');
-    rl.write(data);
+    rl.write('\n');
+    
+    process.stdout.write(decrypt(data.toString().replace(/\r?\n|\r/g, "")));
     rl.setPrompt("you: ");
-    //rl.write('\n');
+    rl.write('\n');
 }
 
 const serverHandler = socket => 
 {
     console.log('client connected:', socket.remoteAddress);
     rl.prompt();
-    socket.on('error', error => { console.log(error.code); });
+
+    process.stdin.resume();
+    
     
     //socket.setEncoding('utf8');
 
     //receive
     socket.on('data', onData);
+    
     //send
-
     const onLine = input =>
     {
+        if(input.match(/^\s*$/))
+        {
+            readline.clearLine(process.stdout, 0);  // clear current text
+            readline.cursorTo(process.stdout, 0);  // move cursor to beginning of line
+        }
         rl.prompt();
-        socket.write(input + "\n");
+        if(input.trim() != "")
+            socket.write(encrypt(input));
     }
     rl.on('line', onLine);
-    //process.stdin.pipe(zip).pipe(encrypt).pipe(socket);
-    //process.stdin.pipe(socket);
-    process.stdin.resume();
-
+    
+    socket.on('error', error => { console.log(error.code); });
 }
 
 module.exports = serverHandler;
