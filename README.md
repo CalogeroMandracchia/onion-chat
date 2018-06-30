@@ -1,7 +1,8 @@
+It's just like nc used for chatting but with 2 layer of encryptions!
 instruction:
 
-tira su il server per ricevere i messaggi
-node server
+run the server to receive messages:
+node ./server
 
-apri il client per mandare messaggi
-node client cmandracchia
+run a client giving as argument the IP of the server
+node client 192.168.1.13
